@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head lang="ru">
+  <meta charset="utf-8">
+  <title>snapme</title>
+  <meta name="description" content="Страница записи на фотосессию" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link href="fav.ico" rel="icon" type="image/png" />
+  <link href="http://fonts.googleapis.com/css?family=Roboto&subset=latin,cyrillic" rel="stylesheet" type="text/css" />
+  <link href="app.css" rel="stylesheet" />
+  <link href="animate.css" rel="stylesheet" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-animate.min.js"></script>
+  <script src="app.js"></script>
+</head>
+
+<body class="body">
+  <header class="container">
+    <div class="snapme-logo">snapme</div>
+
+    <div class="info">
+      <p class="info-text">Добро пожаловать на страницу записи на<br />
+        фотосессию!</p>
+
+      <p class="info-text">После того, как вы заполните форму, мы<br />
+        свяжемся с вами для согласования времени<br />
+        съемки.</p>
+    </div>
+  </header>
+
+  <main class="container" ng-controller="PhotoRegCtrl as photoReg">
+    <div
+      class="text message"
+      ng-show="photoReg.isSubmitted"
+      ng-class="photoReg.isError?'error-text':''"
+    >{{photoReg.isError?'Ошибка регистрации '+photoReg.error:'Ваша заявка принята!'}}</div>
+
+    <form class="reg-form" name="regForm" novalidate>
+      <div class="personal personal-col1">
+        <input
+          class="field personal-field"
+          type="text"
+          name="lastName"
+          placeholder="Фамилия"
+          required
+          ng-model="photoReg.lastName"
+          ng-class="regForm.$submitted &&
+            regForm.lastName.$error.required?'error-field':''"
+        />
+        <input
+          class="field personal-field"
+          type="text"
+          name="firstName"
+          placeholder="Имя" required
+          ng-model="photoReg.firstName"
+          ng-class="regForm.$submitted &&
+            regForm.firstName.$error.required?'error-field':''"
+        />
+        <input
+          class="field personal-field"
+          type="text"
+          name="city"
+          placeholder="Город" required
+          ng-model="photoReg.city"
+          ng-class="regForm.$submitted &&
+            regForm.city.$error.required?'error-field':''"
+        />
+      </div>
+
+      <div class="personal personal-col2">
+        <input
+          class="field personal-field"
+          type="text"
+          name="email"
+          placeholder="e-mail"
+          maxlength="254" required
+          ng-model="photoReg.email"
+          ng-pattern="/^[\w!#$%&'*+/=?`{|}~^-]+(?:\.[\w!#$%&'*+/=?`{|}~^-]+)*@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$/i"
+          ng-class="regForm.$submitted &&
+            (regForm.email.$error.required || regForm.email.$error.pattern)?'error-field':''"
+        />
+        <input
+          class="field personal-field"
+          type="text"
+          name="phone"
+          placeholder="телефон"
+          maxlength="15" required
+          ng-model="photoReg.phone"
+          ng-pattern="/^\+?[0-9]{3,14}$/"
+          ng-class="regForm.$submitted &&
+            (regForm.phone.$error.required || regForm.phone.$error.pattern)?'error-field':''"
+        />
+      </div>
+
+      <div class="photo-link">
+        <div class="text">Добавьте ссылки на ваши фотографии:</div>
+
+        <button
+          class="button add-button add-photo-link-button"
+          type="button"
+          ng-click="photoReg.addPhotoLink()"
+          ng-disabled="photoReg.isAddPhotoLink && !photoReg.checkPhotoLinks()"
+        ></button>
+
+        <input
+          class="field new-photo-link-field"
+          type="text"
+          name="newPhotoLink"
+          placeholder="ваша ссылка"
+          ng-model="photoReg.newPhotoLink"
+          ng-show="photoReg.isAddPhotoLink"
+          set-focus="photoReg.isAddPhotoLink"
+          not-exists-in="photoReg.photoLinks"
+          ng-class="regForm.$submitted &&
+            regForm.newPhotoLink.$error.notExistsIn?'error-field':''"
+        />
+
+        <ul class="photo-link-list">
+          <li class="photo-link-list-item"
+            ng-repeat="link in photoReg.photoLinks"
+          >
+            <button
+              class="button remove-button"
+              type="button"
+              ng-click="photoReg.removePhotoLink(link)"
+            >{{link}}</button>
+          </li>
+        </ul>
+      </div>
+
+      <div class="photo-type">
+        <span
+          class="text"
+          ng-class="regForm.$submitted &&
+            regForm.photoType.$error.required?'error-text':''"
+        >Тип съемки:</span>
+
+        <ul class="photo-type-list">
+          <li>
+            <input
+              class="checkbox"
+              type="checkbox"
+              id="interiorPhotoType"
+              name="photoType"
+              ng-model="photoReg.interiorPhotoType"
+              ng-required="photoReg.checkPhotoType()"
+            /><label class="label" for="interiorPhotoType">интерьер</label>
+          </li>
+          <li>
+            <input
+              class="checkbox"
+              type="checkbox"
+              id="studioPhotoType"
+              name="photoType"
+              ng-model="photoReg.studioPhotoType"
+              ng-required="photoReg.checkPhotoType()"
+            /><label class="label" for="studioPhotoType">студия</label>
+          </li>
+          <li>
+            <input
+              class="checkbox"
+              type="checkbox"
+              id="naturePhotoType"
+              name="photoType"
+              ng-model="photoReg.naturePhotoType"
+              ng-required="photoReg.checkPhotoType()"
+            /><label class="label" for="naturePhotoType">природа</label>
+          </li>
+        </ul>
+
+        <div class="add-photo-type">
+          <button
+            class="button add-button add-photo-type-button"
+            type="button"
+            ng-click="photoReg.addPhotoType()"
+            ng-disabled="photoReg.isAddPhotoType"
+          ></button>
+
+          <span
+            class="label add-photo-type-label"
+            ng-show="!photoReg.isAddPhotoType"
+          >другое</span>
+
+          <input
+            class="field new-photo-type-field"
+            type="text"
+            placeholder="другое"
+            name="photoType"
+            ng-show="photoReg.isAddPhotoType"
+            ng-model="photoReg.newPhotoType"
+            ng-required="photoReg.checkPhotoType()"
+            set-focus="photoReg.isAddPhotoType"
+          />
+        </div>
+      </div>
+
+      <div class="payment">
+        <span
+          class="text"
+          ng-class="regForm.$submitted &&
+            regForm.payment.$error.required?'error-text':''"
+        >Оплата:</span>
+
+        <ul class="payment-list">
+          <li>
+            <input
+              class="checkbox"
+              type="checkbox"
+              id="freePayment"
+              name="payment"
+              ng-model="photoReg.freePayment"
+              ng-required="photoReg.checkPayment()"
+            /><label class="label" for="freePayment">бесплатно</label>
+          </li>
+          <li>
+            <input
+              class="checkbox"
+              type="checkbox"
+              id="rentPayment"
+              name="payment"
+              ng-model="photoReg.rentPayment"
+              ng-required="photoReg.checkPayment()"
+            /><label class="label" for="rentPayment">оплата аренды</label>
+          </li>
+          <li>
+            <input
+              class="checkbox"
+              type="checkbox"
+              id="makeupPayment"
+              name="payment"
+              ng-model="photoReg.makeupPayment"
+              ng-required="photoReg.checkPayment()"
+            /><label class="label" for="makeupPayment">оплата визажиста</label>
+          </li>
+          <li>
+            <input
+              class="checkbox"
+              type="checkbox"
+              id="photoPayment"
+              name="payment"
+              ng-model="photoReg.photoPayment"
+              ng-required="photoReg.checkPayment()"
+            /><label class="label" for="photoPayment">оплата съемки</label>
+          </li>
+        </ul>
+      </div>
+
+      <button
+        class="button submit-button"
+        type="submit"
+        ng-click="photoReg.submit(regForm.$valid)"
+        ng-disabled="(regForm.$submitted && regForm.$invalid) || photoReg.isSubmitting"
+      >Отправить</button>
+
+      <img class="spinner" src="svg/ring.svg" ng-show="photoReg.isSubmitting" />
+    </form>
+  </main>
+
+  <footer class="container">
+    <ul class="sn-counter-list" sn-counters>
+      <li class="sn-counter-list-item">
+        <a class="sn-counter vk-logo"
+          href="http://vk.com/share.php?url=http://snapme.ru/"
+          sn-vk-counter="http://snapme.ru/">_</a>
+      </li>
+      <li class="sn-counter-list-item">
+        <a class="sn-counter facebook-logo"
+          href="http://www.facebook.com/sharer.php?u=http://snapme.ru/"
+          sn-facebook-counter="http://snapme.ru/">_</a>
+      </li>
+      <li class="sn-counter-list-item">
+        <a class="sn-counter twitter-logo"
+          href="http://twitter.com/share?url=http://snapme.ru/"
+          sn-twitter-counter="http://snapme.ru/">_</a>
+      </li>
+    </ul>
+
+    <div class="codepr-logo"></div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,27 @@
+.new-photo-link-field,
+.new-photo-type-field {
+  width: 82px;
+  -webkit-transition: all linear 0.3s;
+  transition: all linear 0.3s;
+}
+
+.new-photo-link-field.ng-hide,
+.new-photo-type-field.ng-hide {
+  width: 0;
+}
+
+.photo-link-list-item.ng-enter,
+.photo-link-list-item.ng-leave {
+  -webkit-transition: all linear 0.3s;
+  transition: all linear 0.3s;
+}
+.photo-link-list-item.ng-enter,
+.photo-link-list-item.ng-leave.ng-leave-active {
+  opacity: 0;
+  max-width: 0;
+}
+.photo-link-list-item.ng-enter.ng-enter-active,
+.photo-link-list-item.ng-leave {
+  opacity: 1;
+  max-width: 100px;
+}
